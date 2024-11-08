@@ -35,6 +35,9 @@ export default function App() {
   const { contacts, q } = useLoaderData<typeof loader>();
   const navigation = useNavigation();
   const submit = useSubmit();
+  const searching =
+    navigation.location &&
+    new URLSearchParams(navigation.location.search).has("q");
 
   // the query now needs to be kept in state
   const [query, setQuery] = useState(q || "");
@@ -65,6 +68,7 @@ export default function App() {
               <input
                 id="q"
                 aria-label="Search contacts"
+                className={searching ? "loading" : ""}
                 // synchronize user's input to component state
                 onChange={(event) => setQuery(event.currentTarget.value)}
                 placeholder="Search"
@@ -73,7 +77,7 @@ export default function App() {
                 value={query}
                 name="q"
               />
-              <div id="search-spinner" aria-hidden hidden={true} />
+              <div id="search-spinner" aria-hidden hidden={!searching} />
             </Form>
             <Form method="post">
               <button type="submit">New</button>
@@ -111,7 +115,9 @@ export default function App() {
         </div>
 
         <div
-          className={navigation.state === "loading" ? "loading" : ""}
+          className={
+            navigation.state === "loading" && !searching ? "loading" : ""
+          }
           id="detail"
         >
           <Outlet />
